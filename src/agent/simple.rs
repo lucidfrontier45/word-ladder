@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
+use crate::judge::Rule;
 use crate::utils::{get_first_char, get_last_char};
 
 use super::Agent;
@@ -9,9 +10,13 @@ pub struct SimpleAgent {
 }
 
 impl SimpleAgent {
-    pub fn new(tokens: impl IntoIterator<Item = String>) -> Self {
+    pub fn new(rule: Rule) -> Self {
         let mut remained_token_map: HashMap<char, HashSet<String>> = HashMap::new();
-        for token in tokens {
+        for token in rule.tokens {
+            let last_char = get_last_char(&token);
+            if rule.invalid_last_chars.contains(&last_char) {
+                continue;
+            }
             let first_char = get_first_char(&token);
             let token_set = remained_token_map
                 .entry(first_char)
@@ -49,6 +54,7 @@ mod test {
     use std::collections::HashSet;
 
     use crate::agent::Agent;
+    use crate::judge::Rule;
 
     #[test]
     fn test() {
@@ -57,8 +63,9 @@ mod test {
             "ゴリラ".to_string(),
             "ラッパ".to_string(),
         ]);
+        let rule = Rule::new(words);
 
-        let mut agent = super::SimpleAgent::new(words);
+        let mut agent = super::SimpleAgent::new(rule);
         let next_token = agent.next_token("リンゴ").unwrap();
         assert_eq!(next_token, "ゴリラ");
         let next_token = agent.next_token("ラッパ");
