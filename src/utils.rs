@@ -4,13 +4,12 @@ pub fn get_first_char(s: &str) -> char {
 
 pub fn get_last_char(s: &str) -> char {
     let last_char = s.chars().last().unwrap();
-    if last_char == 'ー' {
-        //
-        let (last_idx, _) = s.char_indices().last().unwrap();
-        let new_str = &s[..last_idx];
-        return get_last_char(new_str);
-    }
     match last_char {
+        'ー' => {
+            let (last_idx, _) = s.char_indices().last().unwrap();
+            let new_str = &s[..last_idx];
+            get_last_char(new_str)
+        }
         'ァ' => 'ア',
         'ィ' => 'イ',
         'ゥ' => 'ウ',
