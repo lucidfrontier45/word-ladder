@@ -10,16 +10,16 @@ fn main() {
     let rule = shiritori::judge::Rule::with_invalid_last_chars(tokens, ['ン']);
     let mut judge = shiritori::judge::Judge::new(rule.clone());
     let mut agent = shiritori::agent::SimpleAgent::new(rule);
-
+    let mut previous_token: Option<String> = None;
     // start game
     loop {
         // readline from stdin
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
-        let player_token = input.trim();
-        dbg!(player_token);
+        let mut player_token = String::new();
+        std::io::stdin().read_line(&mut player_token).unwrap();
+        player_token = player_token.trim().to_string();
+        dbg!(&player_token);
 
-        let result = judge.make_judgement(player_token);
+        let result = judge.make_judgement(player_token.as_str(), previous_token);
         match result {
             JudgeResult::Lose => {
                 println!("You lose!");
@@ -27,11 +27,14 @@ fn main() {
             }
             JudgeResult::Continue => {}
         }
+        previous_token = Some(player_token);
 
         // agent's turn
-        let agent_token = agent.next_token(player_token).unwrap_or_default();
+        let agent_token = agent
+            .next_token(previous_token.as_ref().unwrap())
+            .unwrap_or_default();
         dbg!(agent_token.as_str());
-        let result = judge.make_judgement(agent_token.as_str());
+        let result = judge.make_judgement(agent_token.as_str(), previous_token);
         match result {
             JudgeResult::Lose => {
                 println!("You win!");
@@ -39,5 +42,6 @@ fn main() {
             }
             JudgeResult::Continue => {}
         }
+        previous_token = Some(agent_token);
     }
 }

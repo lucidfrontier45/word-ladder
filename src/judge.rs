@@ -66,7 +66,7 @@ impl Judge {
         token_set.remove(token);
     }
 
-    pub fn make_judgement(&mut self, token: &str) -> JudgeResult {
+    pub fn make_judgement(&mut self, token: &str, previous_token: Option<String>) -> JudgeResult {
         // check if given token is empty
         if token.is_empty() {
             return JudgeResult::Lose;
@@ -78,8 +78,17 @@ impl Judge {
             return JudgeResult::Lose;
         }
 
-        // check if given token exists in the remained map
         let first_char = get_first_char(token);
+
+        // check if given token starts with the last char of previous token
+        if let Some(previous_token) = previous_token {
+            let previous_last_char = get_last_char(previous_token.as_str());
+            if previous_last_char != first_char {
+                return JudgeResult::Lose;
+            }
+        }
+
+        // check if given token exists in the remained map
         if self
             .remained_token_map
             .get(&first_char)
@@ -112,9 +121,22 @@ mod test {
 
         let mut judge = Judge::new(rule);
 
-        assert_eq!(judge.make_judgement("パン"), super::JudgeResult::Lose);
-        assert_eq!(judge.make_judgement("パンダ"), super::JudgeResult::Lose);
-        assert_eq!(judge.make_judgement("リンゴ"), super::JudgeResult::Continue);
-        assert_eq!(judge.make_judgement("ゴリラ"), super::JudgeResult::Continue);
+        assert_eq!(judge.make_judgement("パン", None), super::JudgeResult::Lose);
+        assert_eq!(
+            judge.make_judgement("パンダ", None),
+            super::JudgeResult::Lose
+        );
+        assert_eq!(
+            judge.make_judgement("リンゴ", None),
+            super::JudgeResult::Continue
+        );
+        assert_eq!(
+            judge.make_judgement("ラッパ", Some("リンゴ".to_string())),
+            super::JudgeResult::Lose
+        );
+        assert_eq!(
+            judge.make_judgement("ゴリラ", Some("リンゴ".to_string())),
+            super::JudgeResult::Continue
+        );
     }
 }
