@@ -1,12 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-fn get_first_char(s: &str) -> char {
-    s.chars().next().unwrap()
-}
-
-fn get_last_char(s: &str) -> char {
-    s.chars().last().unwrap()
-}
+use crate::utils::{get_first_char, get_last_char};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum JudgeResult {
@@ -42,6 +36,11 @@ impl Judge {
     }
 
     pub fn make_judgement(&mut self, token: &str) -> JudgeResult {
+        // check if given token is empty
+        if token.is_empty() {
+            return JudgeResult::Lose;
+        }
+
         // check if given token exists in the remained map
         let first_char = get_first_char(token);
         if !self.remained_token_map.contains_key(&first_char) {
