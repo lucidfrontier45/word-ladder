@@ -1,15 +1,15 @@
-use shiritori::agent::Agent;
-use shiritori::io;
-use shiritori::judge::JudgeResult;
+use word_ladder::agent::Agent;
+use word_ladder::judge::JudgeResult;
+use word_ladder::{agent, io, judge};
 
 fn main() {
     // get args
     let args: Vec<String> = std::env::args().collect();
     let token_list_file = &args[1];
     let tokens = io::read_token_list(token_list_file);
-    let rule = shiritori::judge::Rule::with_invalid_last_chars(tokens, ['ン']);
-    let mut judge = shiritori::judge::Judge::new(rule.clone());
-    let mut agent = shiritori::agent::SimpleAgent::new(rule);
+    let rule = judge::Rule::with_invalid_last_chars(tokens, ['ン']);
+    let mut judge = judge::Judge::new(rule.clone());
+    let mut agent = agent::SimpleAgent::new(rule);
     let mut previous_token: Option<String> = None;
     // start game
     loop {
